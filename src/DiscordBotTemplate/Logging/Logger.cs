@@ -1,10 +1,13 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace DiscordBotTemplate.Logging
 {
     public static class Logger
     {
+        public static List<Task> LogTasks { get; set; } = new List<Task>();
         private static object _lock = new object();
         public static void LogInfo(string message) => LogToConsole(new LogMessage(LogType.Info, message));
         public static void LogWarning(string message) => LogToConsole(new LogMessage(LogType.Warning, message));
@@ -13,7 +16,7 @@ namespace DiscordBotTemplate.Logging
         public static void LogToConsole(LogMessage logMessage)
         {
             // Fire and forget
-            _ = Task.Run(() =>
+            LogTasks.Add(Task.Run(() =>
             {
                 lock (_lock)
                 {
@@ -25,8 +28,12 @@ namespace DiscordBotTemplate.Logging
                         Console.WriteLine();
                         Console.WriteLine(logMessage.Exception.ToString());
                     }
+
+                    LogTasks = LogTasks.Where(x => !x.IsCanceled && !x.IsCompleted && !x.IsCompletedSuccessfully && !x.IsFaulted).ToList();
                 }
-            });
+            }));
+
+            
         }
         private static void PrintSeverityPrefix(LogType severity)
         {

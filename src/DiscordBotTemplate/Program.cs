@@ -5,7 +5,10 @@ using Discord;
 using DiscordBotTemplate.Constants;
 using DiscordBotTemplate.Discord;
 using DiscordBotTemplate.Logging;
+using DiscordBotTemplate.Models;
 using DiscordBotTemplate.Utilities;
+using Newtonsoft.Json;
+using Environment = System.Environment;
 
 namespace DiscordBotTemplate
 {
@@ -14,13 +17,12 @@ namespace DiscordBotTemplate
         public static void Main()
         {
             // Get the current environment
-            var validEnvironments = new[] { "PRODUCTION" , "DEVELOPMENT"};
             var environment = Environment.GetEnvironmentVariable("ENVIRONMENT");
             
             // Make sure environment is valid
-            if (!validEnvironments.Any(x => string.Equals(x, environment, StringComparison.InvariantCultureIgnoreCase)))
+            if (!Enum.TryParse(typeof(Models.Environment), environment, true, out _))
             {
-                Logger.LogError($"'{environment}' is not a valid environment, values are: '{string.Join("', '", validEnvironments)}'");
+                Logger.LogError($"'{environment}' is not a valid environment, values are: '{string.Join("', '", ((Models.Environment[])Enum.GetValues(typeof(Models.Environment))).Select(x => x.ToString()))}'");
                 ApplicationHelper.AnnounceAndExit();
             }
 
@@ -38,7 +40,16 @@ namespace DiscordBotTemplate
                 ApplicationHelper.AnnounceAndExit();
             }
 
-            var templateBot = new TemplateBot(discordBotToken);
+            if (!File.Exists(PathConstants.ConfigFile))
+            {
+                Logger.LogError("Config file doesn't exist, expected it at: " + PathConstants.ConfigFile);
+                ApplicationHelper.AnnounceAndExit();
+            }
+
+            var configString = File.ReadAllText(PathConstants.ConfigFile);
+            var config = JsonConvert.DeserializeObject<Config>(configString);
+
+            var templateBot = new TemplateBot(discordBotToken, config);
 
             // Start the bot in async context from a sync context
             var closingException = templateBot.RunAsync().GetAwaiter().GetResult();
