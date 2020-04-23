@@ -14,13 +14,12 @@ namespace DiscordBotTemplate
         public static void Main()
         {
             // Get the current environment
-            var validEnvironments = new[] { "PRODUCTION" , "DEVELOPMENT"};
             var environment = Environment.GetEnvironmentVariable("ENVIRONMENT");
             
             // Make sure environment is valid
-            if (!validEnvironments.Any(x => string.Equals(x, environment, StringComparison.InvariantCultureIgnoreCase)))
+            if (!Enum.TryParse(typeof(Models.Environment), environment, true, out _))
             {
-                Logger.LogError($"'{environment}' is not a valid environment, values are: '{string.Join("', '", validEnvironments)}'");
+                Logger.LogError($"'{environment}' is not a valid environment, values are: '{string.Join("', '", ((Models.Environment[])Enum.GetValues(typeof(Models.Environment))).Select(x => x.ToString()))}'");
                 ApplicationHelper.AnnounceAndExit();
             }
 
