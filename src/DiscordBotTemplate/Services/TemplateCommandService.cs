@@ -79,9 +79,9 @@ namespace DiscordBotTemplate.Services
                 var argPosition = 0;
 
                 // Determine if the message is a command based on the prefix and make sure no bots trigger commands
-                if (!(message.HasStringPrefix(DiscordConstants.CommandPrefix, ref argPosition) ||
-                      message.HasMentionPrefix(_discordClient.CurrentUser, ref argPosition)) ||
-                    message.Author.IsBot) return;
+                if (message.Author.IsBot ||
+                    !(message.HasStringPrefix(DiscordConstants.CommandPrefix, ref argPosition) ||
+                      message.HasMentionPrefix(_discordClient.CurrentUser, ref argPosition))) return;
 
                 // Create a WebSocket-based command context based on the message
                 var context = new SocketCommandContext(_discordClient, message);
