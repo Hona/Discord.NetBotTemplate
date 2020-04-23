@@ -8,4 +8,4 @@ echo '-= Building Docker Image from Dockerfile ='
 docker build -t template-bot -f ./src/DiscordBotTemplate/Dockerfile .
 
 echo '-= Runnning the Image ='
-docker run -v -e "ENVIRONMENT=DEVELOPMENT" $PWD/PRODUCTION:/app/PRODUCTION -v $PWD/DEVELOPMENT:/app/DEVELOPMENT --network host --restart on-failure:5 --name "template-bot-production" -d template-bot
+docker run -e "ENVIRONMENT=DEVELOPMENT" -v $PWD/PRODUCTION:/app/PRODUCTION -v $PWD/DEVELOPMENT:/app/DEVELOPMENT --network host --restart on-failure:5 --name "template-bot-production" -d template-bot
