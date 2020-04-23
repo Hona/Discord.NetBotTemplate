@@ -5,7 +5,10 @@ using Discord;
 using DiscordBotTemplate.Constants;
 using DiscordBotTemplate.Discord;
 using DiscordBotTemplate.Logging;
+using DiscordBotTemplate.Models;
 using DiscordBotTemplate.Utilities;
+using Newtonsoft.Json;
+using Environment = System.Environment;
 
 namespace DiscordBotTemplate
 {
@@ -37,7 +40,16 @@ namespace DiscordBotTemplate
                 ApplicationHelper.AnnounceAndExit();
             }
 
-            var templateBot = new TemplateBot(discordBotToken);
+            if (!File.Exists(PathConstants.ConfigFile))
+            {
+                Logger.LogError("Config file doesn't exist, expected it at: " + PathConstants.ConfigFile);
+                ApplicationHelper.AnnounceAndExit();
+            }
+
+            var configString = File.ReadAllText(PathConstants.ConfigFile);
+            var config = JsonConvert.DeserializeObject<Config>(configString);
+
+            var templateBot = new TemplateBot(discordBotToken, config);
 
             // Start the bot in async context from a sync context
             var closingException = templateBot.RunAsync().GetAwaiter().GetResult();

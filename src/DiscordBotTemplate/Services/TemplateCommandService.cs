@@ -7,6 +7,8 @@ using Discord.Commands;
 using Discord.WebSocket;
 using DiscordBotTemplate.Constants;
 using DiscordBotTemplate.Logging;
+using DiscordBotTemplate.Models;
+using Environment = System.Environment;
 
 namespace DiscordBotTemplate.Services
 {
@@ -15,12 +17,14 @@ namespace DiscordBotTemplate.Services
         private readonly DiscordSocketClient _discordClient;
         private readonly CommandService _baseCommandService;
         private readonly IServiceProvider _serviceProvider;
+        private readonly Config _config;
 
-        public TemplateCommandService(DiscordSocketClient discordClient, CommandService baseCommandService, IServiceProvider serviceProvider)
+        public TemplateCommandService(DiscordSocketClient discordClient, CommandService baseCommandService, IServiceProvider serviceProvider, Config config)
         {
             _discordClient = discordClient;
             _baseCommandService = baseCommandService;
             _serviceProvider = serviceProvider;
+            _config = config;
         }
 
         public static CommandService BuildBaseCommandService()
@@ -80,7 +84,7 @@ namespace DiscordBotTemplate.Services
 
                 // Determine if the message is a command based on the prefix and make sure no bots trigger commands
                 if (message.Author.IsBot ||
-                    !(message.HasStringPrefix(DiscordConstants.CommandPrefix, ref argPosition) ||
+                    !(message.HasStringPrefix(_config.CommandPrefix, ref argPosition) ||
                       message.HasMentionPrefix(_discordClient.CurrentUser, ref argPosition))) return;
 
                 // Create a WebSocket-based command context based on the message

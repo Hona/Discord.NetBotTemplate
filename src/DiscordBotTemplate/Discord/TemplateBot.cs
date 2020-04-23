@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using Discord;
 using Discord.WebSocket;
+using DiscordBotTemplate.Models;
 using DiscordBotTemplate.Services;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -13,7 +14,7 @@ namespace DiscordBotTemplate.Discord
         private readonly string _discordBotToken;
         private readonly TemplateCommandService _templateCommandService;
 
-        public TemplateBot(string discordBotToken)
+        public TemplateBot(string discordBotToken, Config config)
         {
             _discordBotToken = discordBotToken;
 
@@ -36,7 +37,7 @@ namespace DiscordBotTemplate.Discord
                 .AddSingleton(baseCommandService)
                 .BuildServiceProvider();
 
-            _templateCommandService = new TemplateCommandService(_discordClient, baseCommandService, serviceProvider);
+            _templateCommandService = new TemplateCommandService(_discordClient, baseCommandService, serviceProvider, config);
         }
         internal async Task<Exception> RunAsync()
         {
