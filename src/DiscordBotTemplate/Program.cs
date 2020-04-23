@@ -40,12 +40,14 @@ namespace DiscordBotTemplate
                 ApplicationHelper.AnnounceAndExit();
             }
 
+            // Check the config file exists
             if (!File.Exists(PathConstants.ConfigFile))
             {
                 Logger.LogError("Config file doesn't exist, expected it at: " + PathConstants.ConfigFile);
                 ApplicationHelper.AnnounceAndExit();
             }
 
+            // Load the config file into the model
             var configString = File.ReadAllText(PathConstants.ConfigFile);
             var config = JsonConvert.DeserializeObject<Config>(configString);
 
