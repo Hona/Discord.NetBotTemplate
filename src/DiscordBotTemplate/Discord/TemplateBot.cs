@@ -35,6 +35,7 @@ namespace DiscordBotTemplate.Discord
             var serviceProvider = new ServiceCollection()
                 .AddSingleton(_discordClient)
                 .AddSingleton(baseCommandService)
+                .AddSingleton(config)
                 .BuildServiceProvider();
 
             _templateCommandService = new TemplateCommandService(_discordClient, baseCommandService, serviceProvider, config);
